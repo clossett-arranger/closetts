@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Closette ♡</title>
+<style>
+:root{--bg:#f7f1eb;--paper:#fffdf9;--rose:#d9a6b4;--rose2:#ead0d6;--sage:#b6c5b2;--brown:#68544d;--muted:#9a8982;--border:#e8ddd5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--brown);font-family:"Trebuchet MS",Arial,sans-serif}
+.shell{max-width:1050px;margin:20px auto;padding:12px}.card{background:var(--paper);border:1px solid var(--border);border-radius:24px;box-shadow:0 10px 30px #6b514411;overflow:hidden}
+header{padding:24px 28px;display:flex;justify-content:space-between;align-items:center;background:#f1e6df}
+.logo{font-family:Georgia,serif;font-size:28px;letter-spacing:1px}.logo em{font-style:italic;color:#bd8494}.tiny{font-size:11px;letter-spacing:2px;color:var(--muted);margin-top:5px}
+nav{display:flex;flex-wrap:wrap;gap:8px;padding:15px 22px;border-bottom:1px solid var(--border)}
+nav button,.btn,button{cursor:pointer;border-radius:14px;border:1px solid var(--border);padding:10px 14px;background:white;color:var(--brown);font:inherit}
+nav button.active,.btn{background:var(--rose);color:white;border-color:var(--rose)}
+main{padding:24px}.section{display:none}.section.active{display:block}h2{font:24px Georgia,serif;margin:0 0 8px}p{color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+.item{background:#f8f3ef;border:1px solid var(--border);border-radius:18px;padding:12px;text-align:center;position:relative}
+.item img{width:100%;height:160px;object-fit:contain;background:#fff;border-radius:13px}.name{font-size:14px;margin:8px 0 4px}.tag{font-size:11px;color:var(--muted)}
+.x{position:absolute;right:8px;top:8px;border-radius:50%;padding:4px 8px;background:#fff}
+.empty{grid-column:1/-1;padding:40px;text-align:center;border:1px dashed #d9c7bf;border-radius:18px;color:var(--muted)}
+.lookgrid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;background:#f8f3ef;border-radius:20px;padding:18px}
+.slot{min-width:130px;flex:1;max-width:220px;text-align:center;background:#fff;padding:12px;border-radius:16px;border:1px solid var(--border)}.slot img{width:100%;height:165px;object-fit:contain}
+.savedlook{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px;border-radius:15px;background:#f8f3ef;margin:10px 0}
+select{border:1px solid var(--border);border-radius:13px;padding:10px;background:white;color:var(--brown)}input[type=file]{display:none}
+footer{text-align:center;font-size:11px;color:var(--muted);padding:15px}.welcome{padding:20px;background:#f3e7e1;border-radius:18px;margin-bottom:20px}.welcome .big{font:italic 22px Georgia,serif}
+@media(max-width:600px){.shell{padding:5px}main{padding:16px}header{padding:18px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></head><body><div class="shell"><div class="card">
+<header><div><div class="logo">closette <em>♡</em></div><div class="tiny">A LITTLE PLACE FOR YOUR STYLE</div></div><div style="font-size:23px">✿</div></header>
+<nav><button class="active" data-tab="wardrobe">Wardrobe</button><button data-tab="mix">Outfit mixer</button><button data-tab="saved">Saved looks</button></nav>
+<main>
+<section class="section active" id="wardrobe"><div class="welcome"><div class="big">Getting dressed, made lovely.</div><p>Collect your pieces, play with combinations & find little outfits you love.</p></div><h2>Your wardrobe</h2><p>Everything you own, in one pretty place.</p><div class="toolbar"><label class="btn">＋ Add a piece<input id="files" type="file" accept="image/*" multiple></label><select id="cat"><option value="all">Everything</option><option value="top">Tops</option><option value="bottom">Bottoms</option><option value="dress">Dresses</option><option value="shoes">Shoes</option><option value="accessory">Accessories</option></select></div><div class="grid" id="grid"></div></section>
+<section class="section" id="mix"><h2>Put a look together ✿</h2><p>Let the closet pick a little outfit for you.</p><div class="toolbar"><button class="btn" id="shuffle">♡ Mix my outfit</button><button id="saveLook">Save look</button></div><div id="look" class="lookgrid"><div class="empty">Your outfit will appear here.</div></div></section>
+<section class="section" id="saved"><h2>Your little lookbook</h2><p>Outfits you want to keep.</p><div id="looks"></div></section>
+</main><footer>closette ♡ a tiny wardrobe project</footer></div></div>
+<script>
+const K='closette_v2',L='closette_saved_v2';let clothes=JSON.parse(localStorage.getItem(K)||'[]'),saved=JSON.parse(localStorage.getItem(L)||'[]'),picked=[];
+const el=id=>document.getElementById(id);function saveData(){localStorage.setItem(K,JSON.stringify(clothes));localStorage.setItem(L,JSON.stringify(saved))}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function draw(){let f=el('cat').value,arr=clothes.filter(c=>f==='all'||c.kind===f);el('grid').innerHTML=arr.length?arr.map(c=>`<div class="item"><button class="x" onclick="del('${c.id}')">×</button><img src="${c.img}"><div class="name">${esc(c.name)}</div><div class="tag">${c.kind}</div></div>`).join(''):`<div class="empty">No pieces here yet ♡ Add a photo to begin.</div>`}
+function drawSaved(){el('looks').innerHTML=saved.length?saved.map((s,i)=>`<div class="savedlook"><span>Look ${i+1}: ${s.map(c=>esc(c.name)).join(' · ')}</span><button onclick="delLook(${i})">Remove</button></div>`).join(''):'<div class="empty">Your lookbook is waiting ♡</div>'}
+function del(id){clothes=clothes.filter(c=>c.id!==id);saveData();draw()}function delLook(i){saved.splice(i,1);saveData();drawSaved()}
+function compress(file){return new Promise(r=>{let rd=new FileReader();rd.onload=()=>{let im=new Image();im.onload=()=>{let cv=document.createElement('canvas'),s=Math.min(750/im.width,750/im.height,1);cv.width=im.width*s;cv.height=im.height*s;cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);r(cv.toDataURL('image/jpeg',.7))};im.src=rd.result};rd.readAsDataURL(file)})}
+el('files').onchange=async e=>{for(let f of e.target.files){let img=await compress(f),name=prompt('Give this piece a name ♡',f.name.replace(/\.[^.]+$/,''))||'My piece',kind=(prompt('Category: top, bottom, dress, shoes, accessory','top')||'top').toLowerCase();if(!['top','bottom','dress','shoes','accessory'].includes(kind))kind='top';clothes.push({id:crypto.randomUUID(),name,kind,img})}saveData();draw();e.target.value=''};
+el('cat').onchange=draw;document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.section').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));if(b.dataset.tab==='saved')drawSaved()});
+el('shuffle').onclick=()=>{picked=[];let d=clothes.filter(c=>c.kind==='dress'),t=clothes.filter(c=>c.kind==='top'),b=clothes.filter(c=>c.kind==='bottom'),s=clothes.filter(c=>c.kind==='shoes'),a=clothes.filter(c=>c.kind==='accessory');if(d.length&&Math.random()<.35)picked.push(d[Math.floor(Math.random()*d.length)]);else{if(t.length)picked.push(t[Math.floor(Math.random()*t.length)]);if(b.length)picked.push(b[Math.floor(Math.random()*b.length)])}if(s.length&&Math.random()<.8)picked.push(s[Math.floor(Math.random()*s.length)]);if(a.length&&Math.random()<.5)picked.push(a[Math.floor(Math.random()*a.length)]);el('look').innerHTML=picked.length?picked.map(c=>`<div class="slot"><img src="${c.img}"><div class="name">${esc(c.name)}</div><small>${c.kind}</small></div>`).join(''):'<div class="empty">Add some wardrobe pieces first ♡</div>'};
+el('saveLook').onclick=()=>{if(!picked.length){alert('Mix a look first ♡');return}saved.push(picked.slice());saveData();alert('Saved to your lookbook ♡')};draw();drawSaved();
+</script></body></html>
